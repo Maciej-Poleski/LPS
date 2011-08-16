@@ -10,10 +10,6 @@
  **/
 class Author
 {
-    QString publicKeyFile;
-    QString name;
-    QString email;
-
 public:
     /**
      * @brief Konstruktor domyślny. Pozostawia obiekt niezainicjalizowanym.
@@ -76,6 +72,13 @@ public:
     QString getEmail() const;
 
     /**
+     * @brief Zwraca unikalny identyfikator autora.
+     *
+     * @return quint16 Identyfikator.
+     **/
+    quint16 getID() const;
+
+    /**
      * @brief Ustawia klucz publiczny danemu autorowi.
      *
      * @param file Pełna nazwa plucza publicznego.
@@ -98,6 +101,38 @@ public:
      * @return Author& Dany obiekt.
      **/
     Author & setEmail ( QString email );
+
+    /**
+     * @brief Umożliwia serializację wszystkich danych o autorze do strumienia.
+     *
+     * @param stream Strumień wyjściowy.
+     * @param data Dane które mają zostać zapisane
+     * @return QDataStream& Strumień wyjściowy.
+     **/
+    friend QDataStream & operator<<(QDataStream & stream, const Author & data);
+
+    /**
+     * @brief Umożliwia odczyt wszystkich informacji o autorze ze strumienia.
+     *
+     * @param stream Strumień wejściowy
+     * @param data Obiekt do którego będą odczytane dane.
+     * @return QDataStream& Strumień wejściowy.
+     **/
+    friend QDataStream & operator>>(QDataStream & stream, Author & data);
+
+    /**
+     * @brief Inicjalizuje fabryke obiektów pierwszym dostępnym ID.
+     *
+     * @param lastID Pierwszy dostępny ID.
+     **/
+    static void initialize(quint16 lastID);
+
+private:
+    QString publicKeyFile;
+    QString name;
+    QString email;
+    quint16 id; ///< FIXME: Zaimplementować funkcjonalność
+    static quint16 lastID;
 };
 
 #endif // AUTHOR_HXX

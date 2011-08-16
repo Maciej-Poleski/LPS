@@ -1,9 +1,18 @@
 #define BOOST_TEST_MODULE AuthorTest
-#include <boost/test/unit_test.hpp>
+#include <boost/test/included/unit_test.hpp>
+#include <iostream>
 
 #include "Author.hxx"
 
-BOOST_AUTO_TEST_CASE(constructor)
+#include <QtCore/QDataStream>
+#include <QtCore/QBuffer>
+
+std::ostream & operator<<(std::ostream & out,const QString & string)
+{
+    out<<qPrintable(string);
+}
+
+BOOST_AUTO_TEST_CASE( constructor )
 {
     Author a1;
     BOOST_CHECK(a1.isNull());
@@ -42,4 +51,72 @@ BOOST_AUTO_TEST_CASE(constructor)
     BOOST_CHECK_EQUAL(a4.getPublicKeyFile(),"pubkey3");
     BOOST_CHECK_EQUAL(a4.getName(),"name2");
     BOOST_CHECK_EQUAL(a4.getEmail(),"email1");
+}
+
+BOOST_AUTO_TEST_CASE(getters_and_setters)
+{
+    Author a1("pubkey","name","e-mail");
+    BOOST_CHECK_EQUAL(a1.getEmail(),"e-mail");
+    BOOST_CHECK_EQUAL(a1.getName(),"name");
+    BOOST_CHECK_EQUAL(a1.getPublicKeyFile(),"pubkey");
+    a1.setEmail("email1");
+    BOOST_CHECK_EQUAL(a1.getEmail(),"email1");
+    a1.setName("name1");
+    BOOST_CHECK_EQUAL(a1.getName(),"name1");
+    a1.setPublicKeyFile("pubkey1");
+    BOOST_CHECK_EQUAL(a1.getPublicKeyFile(),"pubkey1");
+
+    a1.setEmail("email2").setName("name2").setPublicKeyFile("pubkey2");
+    BOOST_CHECK_EQUAL(a1.getEmail(),"email2");
+    BOOST_CHECK_EQUAL(a1.getName(),"name2");
+    BOOST_CHECK_EQUAL(a1.getPublicKeyFile(),"pubkey2");
+
+    a1.setEmail("").setPublicKeyFile("");
+    BOOST_CHECK_EQUAL(a1.getEmail(),"");
+    BOOST_CHECK_EQUAL(a1.getEmail(),QString());
+    BOOST_CHECK_EQUAL(a1.getPublicKeyFile(),"");
+    BOOST_CHECK_EQUAL(a1.getPublicKeyFile(),QString());
+    BOOST_CHECK_EQUAL(a1.hasEmail(),false);
+    BOOST_CHECK_EQUAL(a1.isNull(),true);
+
+    BOOST_CHECK_EQUAL(a1.hasName(),true);
+    a1.setName(QString());
+    BOOST_CHECK_EQUAL(a1.getName(),"");
+    BOOST_CHECK_EQUAL(a1.getName(),QString());
+    BOOST_CHECK_EQUAL(a1.hasName(),false);
+}
+
+BOOST_AUTO_TEST_CASE(serialization)
+{
+    Author::initialize(2);
+    Author a1("pubkey1","name1","email1");
+    Author a2("pubkey2","name2","email2");
+
+    QBuffer buffer;
+    buffer.open(QIODevice::ReadWrite);
+    QDataStream stream(&buffer);
+
+    stream<<a1<<a2;
+    assert(false);
+
+    Author a3,a4;
+    stream>>a3>>a4;
+    stream<<a3;
+    stream>>a2;
+
+    BOOST_CHECK_EQUAL(a3.getEmail(),"email1");
+    BOOST_CHECK_EQUAL(a3.getID(),2);
+    BOOST_CHECK_EQUAL(a3.getName(),"name1");
+    BOOST_CHECK_EQUAL(a3.getPublicKeyFile(),"pubkey1");
+
+    BOOST_CHECK_EQUAL(a4.getEmail(),"email2");
+    BOOST_CHECK_EQUAL(a4.getID(),3);
+    BOOST_CHECK_EQUAL(a4.getName(),"name2");
+    BOOST_CHECK_EQUAL(a4.getPublicKeyFile(),"pubkey2");
+
+    BOOST_CHECK_EQUAL(a2.getEmail(),"email1");
+    BOOST_CHECK_EQUAL(a2.getID(),2);
+    BOOST_CHECK_EQUAL(a2.getName(),"name1");
+    BOOST_CHECK_EQUAL(a2.getPublicKeyFile(),"pubkey1");
+    
 }

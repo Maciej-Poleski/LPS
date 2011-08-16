@@ -12,6 +12,9 @@
  **/
 class Example
 {
+public:
+    
+private:
     Author author;
     QString example;
     QString comment;
