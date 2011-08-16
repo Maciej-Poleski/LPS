@@ -10,7 +10,7 @@
 /**
  * @brief Przechowuje pojedynczy przykład wykorzystywany w prototypowniu.
  **/
-class Prototype
+class Example
 {
     Author author;
     QString example;
