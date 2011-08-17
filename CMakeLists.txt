@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 2.8 FATAL_ERROR)
 project(Language_Prototyping_Server)
 set(QT_USE_IMPORTED_TARGETS TRUE)
 find_package(Qt4 REQUIRED QtCore QtNetwork)
+set(Boost_ADDITIONAL_VERSIONS "1.47" "1.47.0")
 find_package(Boost 1.46.1 REQUIRED)
 
 include(${QT_USE_FILE})
