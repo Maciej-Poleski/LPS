@@ -6,10 +6,11 @@
 
 #include <QtCore/QDataStream>
 #include <QtCore/QBuffer>
+#include <QtCore/QTemporaryFile>
 
 std::ostream & operator<<(std::ostream & out,const QString & string)
 {
-    out<<qPrintable(string);
+    return out<<qPrintable(string);
 }
 
 BOOST_AUTO_TEST_CASE( constructor )
@@ -92,12 +93,12 @@ BOOST_AUTO_TEST_CASE(serialization)
     Author a1("pubkey1","name1","email1");
     Author a2("pubkey2","name2","email2");
 
-    QBuffer buffer;
-    buffer.open(QIODevice::ReadWrite);
-    QDataStream stream(&buffer);
-
+	QTemporaryFile file;
+	BOOST_REQUIRE(file.open());
+	QDataStream stream(&file);
     stream<<a1<<a2;
-    assert(false);
+
+	file.flush();
 
     Author a3,a4;
     stream>>a3>>a4;
