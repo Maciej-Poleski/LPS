@@ -93,17 +93,20 @@ BOOST_AUTO_TEST_CASE(serialization)
     Author a1("pubkey1","name1","email1");
     Author a2("pubkey2","name2","email2");
 
-	QTemporaryFile file;
-	BOOST_REQUIRE(file.open());
-	QDataStream stream(&file);
-    stream<<a1<<a2;
+	QByteArray buffer;
+	QBuffer output(&buffer);;
+	output.open(QIODevice::WriteOnly);
+	QDataStream outputStream(&output);
+    outputStream<<a1<<a2;
 
-	file.flush();
+	QBuffer input(&buffer);
+	input.open(QIODevice::ReadOnly);
+	QDataStream inputStream(&input);
 
     Author a3,a4;
-    stream>>a3>>a4;
-    stream<<a3;
-    stream>>a2;
+    inputStream>>a3>>a4;
+    outputStream<<a3;
+    inputStream>>a2;
 
     BOOST_CHECK_EQUAL(a3.getEmail(),"email1");
     BOOST_CHECK_EQUAL(a3.getID(),2);
